@@ -130,7 +130,7 @@ class Client(object):
                 # API Method descriptions.  Used as a helpful reference.
                 self.services[service_name] = service_details
 
-    def _call(self, service_name, parameters=None, **kwargs):
+    def _call(self, service_name, parameters=None, files=None, **kwargs):
         if not self.token:
             raise exceptions.TokenError('Meetup oauth2 token not set')
         if not parameters:
@@ -163,7 +163,8 @@ class Client(object):
         if request_http_method == 'GET':
             response = self.session.get(request_url, params=parameters)
         elif request_http_method == 'POST':
-            response = self.session.post(request_url, data=parameters)
+            self.session.headers.update({'Authorization': 'Bearer %s' % parameters['access_token']})
+            response = self.session.post(request_url, data=parameters, files=files)
         elif request_http_method == 'DELETE':
             response = self.session.delete(request_url, params=parameters)
         else:
